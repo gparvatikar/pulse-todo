@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse ToDo — App Store & Google Play Publishing Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #131b2e;
+      --surface-elevated: #1b253d;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --sky: #0ea5e9;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 15% 0%, #1e1b4b 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      padding-bottom: 60px;
+    }
+
+    /* Top Header */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(19, 27, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .badge-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      color: var(--text);
+      transition: all 0.18s ease;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #263354;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    }
+
+    .btn-emerald {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .btn-emerald:hover {
+      background: rgba(16, 185, 129, 0.28);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(139, 92, 246, 0.08));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 18px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .progress-box {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border);
+      padding: 16px 22px;
+      border-radius: 14px;
+      min-width: 240px;
+      text-align: center;
+    }
+
+    .progress-count {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #34d399;
+    }
+
+    .progress-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Grid Layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .card-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Asset Preview Box */
+    .asset-preview {
+      background: rgba(11, 15, 25, 0.7);
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 150px;
+      overflow: hidden;
+    }
+
+    .asset-preview img {
+      max-height: 125px;
+      max-width: 100%;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Screenshot Generator Strip */
+    .screenshot-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .shot-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .shot-card canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Copy Metadata Fields */
+    .copy-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .copy-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .copy-box {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .copy-text {
+      flex: 1;
+      font-size: 0.86rem;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .copy-btn {
+      align-self: flex-start;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: rgba(99, 102, 241, 0.16);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Interactive Checklist */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 15px;
+      border-radius: 11px;
+      background: rgba(11, 15, 25, 0.6);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .check-item:hover {
+      border-color: rgba(99, 102, 241, 0.45);
+      background: rgba(19, 27, 46, 0.9);
+    }
+
+    .check-item.completed {
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.07);
+    }
+
+    .check-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--emerald);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .check-content {
+      flex: 1;
+    }
+
+    .check-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .check-item.completed .check-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .check-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .check-desc code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: #e2e8f0;
+      font-size: 0.78rem;
+    }
+
+    .check-desc a {
+      color: #818cf8;
+      text-decoration: underline;
+    }
+
+    /* Questionnaire Table */
+    .q-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .q-table th,
+    .q-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .q-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .ans-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+    }
+
+    @media (max-width: 768px) {
+      .topbar { padding: 14px 18px; }
+      .container { padding: 20px 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="/icons/icon-192.png" alt="Pulse ToDo" />
+      <span>Pulse ToDo — Store Publishing Center</span>
+      <span class="badge-pill">Ready for Release v1.0.0</span>
+    </div>
+    <div class="nav-links">
+      <a href="/mobile-preview.html" class="btn">📱 Mobile Simulator</a>
+      <a href="/privacy.html" target="_blank" class="btn">🔒 Privacy Policy Page</a>
+      <a href="/" class="btn btn-primary">✨ Open Pulse ToDo App</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div>
+        <h1>Publish Pulse ToDo to Google Play &amp; Apple App Store</h1>
+        <p>
+          Everything is pre-configured for your Windows laptop. Download your required store graphics and promotional screenshots below, copy-paste the store listing text, and follow the cloud build checklist to submit your signed <code>.aab</code> and <code>.ipa</code> binaries.
+        </p>
+      </div>
+      <div class="progress-box">
+        <div class="progress-count" id="checklistProgress">0 / 11</div>
+        <div class="progress-label">Publishing Steps Completed</div>
+      </div>
+    </section>
+
+    <!-- STEP 1: Download Required Store Graphics -->
+    <div class="section-header">
+      <div class="section-title">
+        <span class="step-num">1</span>
+        <span>Download Official Store Graphic Assets</span>
+      </div>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Pre-rendered to exact Google Play &amp; Apple App Store pixel specifications</span>
+    </div>
+
+    <div class="grid-3">
+      <!-- Google Play 512x512 Icon -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Google Play Hi-Res Icon</div>
+            <div class="card-sub">512 × 512 px • 32-bit PNG</div>
+          </div>
+          <span class="badge-pill">Google Play</span>
+        </div>
+        <div class="asset-preview">
+          <img src="/icons/icon-512.png" alt="512x512 Icon" />
+        </div>
+        <a href="/icons/icon-512.png" download="pulse-todo-google-play-icon-512x512.png" class="btn btn-primary" style="justify-content:center;">
+          ⬇️ Download 512×512 Icon (.png)
+        </a>
+      </div>
+
+      <!-- Google Play 1024x500 Feature Graphic -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Google Play Feature Graphic</div>
+            <div class="card-sub">1024 × 500 px • Required Store Banner</div>
+          </div>
+          <span class="badge-pill">Google Play</span>
+        </div>
+        <div class="asset-preview">
+          <img src="/icons/feature-graphic-1024x500.png" alt="1024x500 Feature Graphic" style="border-radius:8px;" />
+        </div>
+        <a href="/icons/feature-graphic-1024x500.png" download="pulse-todo-feature-graphic-1024x500.png" class="btn btn-primary" style="justify-content:center;">
+          ⬇️ Download 1024×500 Banner (.png)
+        </a>
+      </div>
+
+      <!-- Apple App Store 1024x1024 Icon -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Apple App Store Master Icon</div>
+            <div class="card-sub">1024 × 1024 px • Opaque RGB PNG (No Alpha)</div>
+          </div>
+          <span class="badge-pill" style="background:rgba(14,165,233,0.18); color:#38bdf8; border-color:rgba(14,165,233,0.35);">App Store</span>
+        </div>
+        <div class="asset-preview">
+          <img src="/icons/icon-1024.png" alt="1024x1024 Icon" />
+        </div>
+        <a href="/icons/icon-1024.png" download="pulse-todo-app-store-icon-1024x1024.png" class="btn btn-primary" style="justify-content:center;">
+          ⬇️ Download 1024×1024 Icon (.png)
+        </a>
+      </div>
+    </div>
+
+    <!-- STEP 2: 1-Click Promotional Store Screenshots (1080x1920) -->
+    <div class="section-header">
+      <div class="section-title">
+        <span class="step-num">2</span>
+        <span>Download Store Phone Screenshots (1080 × 1920 px)</span>
+      </div>
+      <button class="btn btn-emerald" id="downloadAllShotsBtn">⬇️ Download All 4 Store Screenshots</button>
+    </div>
+
+    <div class="screenshot-strip">
+      <div class="shot-card">
+        <canvas id="shotCanvas1" width="1080" height="1920"></canvas>
+        <button class="btn" onclick="downloadCanvas('shotCanvas1', 'pulse-todo-screenshot-1-today.png')" style="justify-content:center;">⬇️ Screenshot 1: Today Focus</button>
+      </div>
+      <div class="shot-card">
+        <canvas id="shotCanvas2" width="1080" height="1920"></canvas>
+        <button class="btn" onclick="downloadCanvas('shotCanvas2', 'pulse-todo-screenshot-2-recurring.png')" style="justify-content:center;">⬇️ Screenshot 2: Smart Routines</button>
+      </div>
+      <div class="shot-card">
+        <canvas id="shotCanvas3" width="1080" height="1920"></canvas>
+        <button class="btn" onclick="downloadCanvas('shotCanvas3', 'pulse-todo-screenshot-3-categories.png')" style="justify-content:center;">⬇️ Screenshot 3: Categories</button>
+      </div>
+      <div class="shot-card">
+        <canvas id="shotCanvas4" width="1080" height="1920"></canvas>
+        <button class="btn" onclick="downloadCanvas('shotCanvas4', 'pulse-todo-screenshot-4-darkmode.png')" style="justify-content:center;">⬇️ Screenshot 4: Dark Mode</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Cloud Build & Store Submission Checklists -->
+    <div class="section-header">
+      <div class="section-title">
+        <span class="step-num">3</span>
+        <span>Step-by-Step Publishing Guide (Windows Laptop Friendly)</span>
+      </div>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Check off each item as you complete it — progress saves automatically</span>
+    </div>
+
+    <!-- NEW: 1-Click Auto-Upload to GitHub Widget (No Drag-and-Drop Needed!) -->
+    <div class="card" style="margin-bottom: 22px; border-color: rgba(99, 102, 241, 0.5); background: linear-gradient(135deg, rgba(30, 27, 75, 0.8), rgba(19, 27, 46, 0.95));">
+      <div class="card-header">
+        <div>
+          <div class="card-title" style="font-size: 1.08rem;">⚡ Option A (Easiest): 1-Click Auto-Upload to GitHub &amp; Start Mobile Build</div>
+          <div class="card-sub">Skip manual file uploading! This automatically creates your <code>pulse-todo</code> repository, uploads all 22 project files (including the hidden <code>.github/workflows</code> folder), and starts building your signed Android <code>.aab</code> &amp; iOS project.</div>
+        </div>
+        <span class="badge-pill">No Git or Drag &amp; Drop Needed</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: end; margin-top: 4px;">
+        <div>
+          <label style="display:block; font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:6px;">
+            1. Get a GitHub Token (<a href="https://github.com/settings/tokens/new?scopes=repo,workflow&description=PulseToDo-Publisher" target="_blank" rel="noopener" style="color:#818cf8; text-decoration:underline;">Click here → scroll down &amp; click "Generate token"</a>)
+          </label>
+          <input type="password" id="ghTokenInput" placeholder="Paste token (ghp_...)" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0b0f19; color:#fff; font-size:0.88rem;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:6px;">
+            2. Repository Name
+          </label>
+          <input type="text" id="ghRepoInput" value="pulse-todo" style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#0b0f19; color:#fff; font-size:0.88rem;" />
+        </div>
+        <div>
+          <button type="button" id="autoPushGithubBtn" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px 16px;">
+            🚀 Auto-Upload All Files &amp; Build App
+          </button>
+        </div>
+      </div>
+
+      <div id="ghPushStatus" style="display:none; padding:12px 16px; border-radius:10px; font-size:0.86rem; margin-top:6px;"></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Cloud Build & Google Play Checklist -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🤖 Part A: Cloud Build &amp; Google Play Store</div>
+            <div class="card-sub">Builds signed <code>pulse-todo-signed.aab</code> &amp; <code>.apk</code> in the cloud</div>
+          </div>
+          <span class="badge-pill">Android</span>
+        </div>
+
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-1" />
+            <div class="check-content">
+              <div class="check-title">1. Push Project to GitHub (Use 1-Click Box Above or Manual Upload)</div>
+              <div class="check-desc">
+                <strong>Recommended:</strong> Use the <strong>1-Click Auto-Upload</strong> box above.<br>
+                <strong>Manual alternative:</strong> On <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>, type <code>pulse-todo</code>, scroll all the way to the bottom and click the green <strong>"Create repository"</strong> button FIRST. On the <em>next</em> screen, click the blue <strong>"uploading an existing file"</strong> link (or if you added a README, click <strong>Add file → Upload files</strong> in the top right).
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-2" />
+            <div class="check-content">
+              <div class="check-title">2. Download Signed .AAB Bundle from GitHub Actions</div>
+              <div class="check-desc">
+                Open the <strong>Actions</strong> tab in your GitHub repo. Our workflow (<code>.github/workflows/mobile-release.yml</code>) automatically compiles and signs your Android release! Download <code>pulse-todo-google-play-signed-bundle.zip</code> containing <code>pulse-todo-signed.aab</code> and your backup <code>pulse-todo-upload-key.jks</code>.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-3" />
+            <div class="check-content">
+              <div class="check-title">3. Create App in Google Play Console ($25 one-time fee)</div>
+              <div class="check-desc">
+                Go to <a href="https://play.google.com/console" target="_blank" rel="noopener">play.google.com/console</a> → <strong>Create app</strong>. Set App Name to <code>Pulse ToDo — Tasks &amp; Routines</code>, Type: <strong>App</strong>, Free/Paid: <strong>Free</strong>.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-4" />
+            <div class="check-content">
+              <div class="check-title">4. Complete Main Store Listing &amp; Graphic Assets</div>
+              <div class="check-desc">
+                Copy-paste the Short &amp; Full Descriptions below, upload the <strong>512×512 Icon</strong>, the <strong>1024×500 Feature Graphic</strong>, and the <strong>4 Phone Screenshots</strong> from Steps 1 &amp; 2 above.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-5" />
+            <div class="check-content">
+              <div class="check-title">5. Complete App Content (Privacy Policy &amp; Data Safety)</div>
+              <div class="check-desc">
+                Use the Data Safety Cheat Sheet below (select <strong>"No, my app does not collect or share any user data"</strong>) and paste your hosted Privacy Policy URL.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="gp-6" />
+            <div class="check-content">
+              <div class="check-title">6. Upload <code>pulse-todo-signed.aab</code> &amp; Roll Out Release</div>
+              <div class="check-desc">
+                Go to <strong>Testing → Closed testing</strong> (or <strong>Production</strong>), click <strong>Create new release</strong>, upload <code>pulse-todo-signed.aab</code>, and click <strong>Start rollout</strong>!
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Apple App Store Checklist -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🍎 Part B: Apple App Store Connect (No Mac Needed)</div>
+            <div class="card-sub">Uses <code>codemagic.yaml</code> cloud macOS runner to sign &amp; upload to TestFlight</div>
+          </div>
+          <span class="badge-pill" style="background:rgba(14,165,233,0.18); color:#38bdf8; border-color:rgba(14,165,233,0.35);">iOS / Apple</span>
+        </div>
+
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox" data-step="ios-1" />
+            <div class="check-content">
+              <div class="check-title">1. Register Bundle ID <code>com.pulsetodo.app</code></div>
+              <div class="check-desc">
+                In <a href="https://developer.apple.com/account/resources/identifiers/list" target="_blank" rel="noopener">Apple Developer Portal</a> ($99/yr), register a new App ID with Bundle ID <code>com.pulsetodo.app</code>.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="ios-2" />
+            <div class="check-content">
+              <div class="check-title">2. Create App Record in App Store Connect</div>
+              <div class="check-desc">
+                Go to <a href="https://appstoreconnect.apple.com" target="_blank" rel="noopener">appstoreconnect.apple.com</a> → <strong>My Apps → (+) New App</strong>. Select <strong>iOS</strong>, Name: <code>Pulse ToDo</code>, Bundle ID: <code>com.pulsetodo.app</code>, SKU: <code>PULSETODO001</code>.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="ios-3" />
+            <div class="check-content">
+              <div class="check-title">3. Connect GitHub Repo to Codemagic (Free macOS Cloud)</div>
+              <div class="check-desc">
+                Since you are on a Windows laptop, sign in to <a href="https://codemagic.io" target="_blank" rel="noopener">codemagic.io</a> with GitHub. It automatically detects our <code>codemagic.yaml</code> file! Connect your App Store Connect API Key under Integrations.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="ios-4" />
+            <div class="check-content">
+              <div class="check-title">4. Trigger Cloud iOS Build &amp; Auto-Upload to TestFlight</div>
+              <div class="check-desc">
+                Click <strong>Start new build</strong> in Codemagic. It provisions a cloud Mac mini M2, injects your 1024×1024 App Icon, signs the <code>.ipa</code>, and uploads it directly to your App Store Connect account.
+              </div>
+            </div>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" data-step="ios-5" />
+            <div class="check-content">
+              <div class="check-title">5. Paste Store Metadata, Screenshots &amp; Submit for Review</div>
+              <div class="check-desc">
+                In App Store Connect, upload the 4 screenshots from Step 2, copy-paste the Subtitle, Promotional Text, Description &amp; Keywords below, select the uploaded build, and click <strong>Add for Review</strong>!
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Copy-Paste Store Listing Metadata -->
+    <div class="section-header">
+      <div class="section-title">
+        <span class="step-num">4</span>
+        <span>One-Click Copy-Paste Store Listing Metadata</span>
+      </div>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Pre-validated against Google Play &amp; Apple App Store character limits</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Left Column: Titles, Subtitles, Short Desc, Keywords -->
+      <div class="card">
+        <div class="card-title">App Identity &amp; Short Metadata</div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>App Name (Google Play &amp; Apple App Store)</span>
+            <span>29 / 30 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaTitle">Pulse ToDo — Tasks &amp; Routines</div>
+            <button class="copy-btn" onclick="copyField('metaTitle', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Package Name / Bundle Identifier</span>
+            <span>Exact Match</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaBundle">com.pulsetodo.app</div>
+            <button class="copy-btn" onclick="copyField('metaBundle', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Apple App Store Subtitle</span>
+            <span>29 / 30 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaSubtitle">Smart Daily Planner &amp; Tasks</div>
+            <button class="copy-btn" onclick="copyField('metaSubtitle', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Google Play Short Description</span>
+            <span>75 / 80 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaShortDesc">Clean, fast task manager with due dates, recurring routines &amp; offline sync.</div>
+            <button class="copy-btn" onclick="copyField('metaShortDesc', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Apple App Store Promotional Text</span>
+            <span>158 / 170 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaPromo">Stay effortlessly organized with Pulse ToDo. Plan daily tasks, set smart recurring schedules, track priorities, and work 100% offline with zero data tracking.</div>
+            <button class="copy-btn" onclick="copyField('metaPromo', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Apple App Store Search Keywords (Comma-Separated)</span>
+            <span>89 / 100 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaKeywords">todo,tasks,planner,reminders,recurring,checklist,daily,routine,organizer,gtd,productivity</div>
+            <button class="copy-btn" onclick="copyField('metaKeywords', this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Full Store Description & Release Notes -->
+      <div class="card">
+        <div class="card-title">Full Store Description &amp; Release Notes</div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>Full Description (Google Play &amp; Apple App Store)</span>
+            <span>940 / 4000 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaFullDesc">Pulse ToDo is a modern, fast, and distraction-free task manager designed to help you capture ideas, stay on top of deadlines, and build lasting daily habits.
+
+KEY FEATURES:
+• Quick Task Capture: Add tasks in seconds with live character feedback and smart progressive options.
+• Flexible Recurring Schedules: Automatically repeat tasks Daily, on Weekdays (Mon–Fri), Weekly, Monthly, or Yearly. When you complete a recurring task, Pulse ToDo automatically schedules the next occurrence for you.
+• Smart Due Dates &amp; Views: Focus on what matters right now with dedicated Today, Upcoming, Overdue, and All Tasks views.
+• Color-Coded Categories: Organize your life across Personal, Work, Shopping, Health, Finance, or custom color categories.
+• Priority Levels &amp; Detailed Notes: Highlight high-priority tasks and attach rich context notes.
+• Dark &amp; Light Themes: Crafted for visual comfort day or night.
+• 100% Offline &amp; Private: All tasks and categories are stored directly on your device. No account sign-up required, no ads, and zero tracking.</div>
+            <button class="copy-btn" onclick="copyField('metaFullDesc', this)">Copy</button>
+          </div>
+        </div>
+
+        <div class="copy-group">
+          <div class="copy-label-row">
+            <span>What's New / Release Notes (v1.0.0)</span>
+            <span>215 / 500 chars</span>
+          </div>
+          <div class="copy-box">
+            <div class="copy-text" id="metaReleaseNotes">Welcome to Pulse ToDo v1.0.0!
+• Fast task capture with priority levels, due dates, and notes
+• Automatic recurring tasks (Daily, Weekdays, Weekly, Monthly, Yearly)
+• Color-coded custom categories &amp; instant Dark Mode
+• Full offline storage support</div>
+            <button class="copy-btn" onclick="copyField('metaReleaseNotes', this)">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Data Safety, App Privacy & Content Rating Cheat Sheet -->
+    <div class="section-header">
+      <div class="section-title">
+        <span class="step-num">5</span>
+        <span>Store Compliance, Data Safety &amp; Content Rating Answers</span>
+      </div>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Exact answers for Google Play App Content &amp; Apple App Privacy questionnaires</span>
+    </div>
+
+    <div class="card">
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th>Store Questionnaire Item</th>
+            <th>Required Selection</th>
+            <th>Explanation / Reviewer Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Data Collection &amp; Sharing</strong><br><span style="color:var(--text-muted);font-size:0.78rem;">Google Play Data Safety &amp; Apple App Privacy</span></td>
+            <td><span class="ans-badge">NO (Data Not Collected)</span></td>
+            <td>Pulse ToDo stores all tasks and preferences locally on the user's device. No personal data, analytics, or identifiers are transmitted externally.</td>
+          </tr>
+          <tr>
+            <td><strong>App Access / Sign-In Credentials</strong><br><span style="color:var(--text-muted);font-size:0.78rem;">Google Play App Access &amp; Apple App Review</span></td>
+            <td><span class="ans-badge">All functionality available without access restrictions</span></td>
+            <td>No login, account creation, or paywall exists. Reviewers have immediate full access on launch.</td>
+          </tr>
+          <tr>
+            <td><strong>Ads Declaration</strong><br><span style="color:var(--text-muted);font-size:0.78rem;">Google Play Ads Section</span></td>
+            <td><span class="ans-badge">No, my app does not contain ads</span></td>
+            <td>100% ad-free productivity utility.</td>
+          </tr>
+          <tr>
+            <td><strong>Content Rating / Age Rating</strong><br><span style="color:var(--text-muted);font-size:0.78rem;">IARC / Apple Age Rating Questionnaire</span></td>
+            <td><span class="ans-badge">Select "NO" to all violence/mature questions</span></td>
+            <td>Category: <strong>Utility / Productivity</strong>. Results in <strong>PEGI 3 / Everyone / 4+</strong> rating across all regions.</td>
+          </tr>
+          <tr>
+            <td><strong>Export Compliance (Encryption)</strong><br><span style="color:var(--text-muted);font-size:0.78rem;">Apple App Store Connect TestFlight / Build</span></td>
+            <td><span class="ans-badge">None of the algorithms mentioned above (No non-exempt encryption)</span></td>
+            <td>App only uses standard OS HTTPS/TLS networking provided by Apple iOS.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // 1. Copy to Clipboard Helper
+    function copyField(elementId, btn) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = '✓ Copied!';
+        btn.style.background = '#10b981';
+        btn.style.color = '#fff';
+        setTimeout(() => {
+          btn.innerText = orig;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 1800);
+      });
+    }
+
+    // 2. Checklist Persistence
+    const CHECKLIST_KEY = 'pulse_todo_store_checklist_v1';
+    const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+    const progressEl = document.getElementById('checklistProgress');
+
+    function loadChecklist() {
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}');
+      } catch (e) {}
+      let completed = 0;
+      checkboxes.forEach(cb => {
+        const key = cb.getAttribute('data-step');
+        cb.checked = !!saved[key];
+        cb.closest('.check-item').classList.toggle('completed', cb.checked);
+        if (cb.checked) completed++;
+      });
+      progressEl.textContent = `${completed} / ${checkboxes.length}`;
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const saved = {};
+        checkboxes.forEach(item => {
+          saved[item.getAttribute('data-step')] = item.checked;
+        });
+        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(saved));
+        loadChecklist();
+      });
+    });
+
+    loadChecklist();
+
+    // 3. Render 1080x1920 Store Promotional Screenshots on Canvas
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function renderPromoScreenshot(canvasId, config) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const W = 1080, H = 1920;
+
+      // Background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+      bgGrad.addColorStop(0, config.bgStart);
+      bgGrad.addColorStop(1, config.bgEnd);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Decorative glow
+      const glow = ctx.createRadialGradient(W * 0.5, 280, 20, W * 0.5, 280, 520);
+      glow.addColorStop(0, 'rgba(255,255,255,0.16)');
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Top Pill Tag
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      roundRect(ctx, (W - 340) / 2, 100, 340, 54, 27);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 24px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(config.tag.toUpperCase(), W / 2, 135);
+
+      // Marketing Headline
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 64px Inter, sans-serif';
+      ctx.fillText(config.titleLine1, W / 2, 245);
+      ctx.fillText(config.titleLine2, W / 2, 325);
+
+      // Subtitle
+      ctx.fillStyle = 'rgba(255,255,255,0.82)';
+      ctx.font = '500 32px Inter, sans-serif';
+      ctx.fillText(config.subtitle, W / 2, 395);
+
+      // Phone Mockup Frame
+      const phoneX = 90, phoneY = 470, phoneW = 900, phoneH = 1360;
+      ctx.fillStyle = '#090d16';
+      roundRect(ctx, phoneX - 18, phoneY - 18, phoneW + 36, phoneH + 36, 76);
+      ctx.fill();
+
+      // Screen Surface
+      ctx.fillStyle = config.darkScreen ? '#0f172a' : '#f8fafc';
+      roundRect(ctx, phoneX, phoneY, phoneW, phoneH, 60);
+      ctx.fill();
+
+      // App Header inside Phone
+      ctx.textAlign = 'left';
+      ctx.fillStyle = config.darkScreen ? '#f8fafc' : '#0f172a';
+      ctx.font = '800 44px Inter, sans-serif';
+      ctx.fillText(config.viewTitle, phoneX + 60, phoneY + 115);
+
+      ctx.fillStyle = config.darkScreen ? '#94a3b8' : '#64748b';
+      ctx.font = '500 26px Inter, sans-serif';
+      ctx.fillText(config.viewSub, phoneX + 60, phoneY + 160);
+
+      // Chip Strip inside Phone
+      const chips = ['All Tasks', 'Today', 'Upcoming', 'Work', 'Personal'];
+      let chipX = phoneX + 60;
+      chips.forEach((chip, idx) => {
+        const active = idx === config.activeChip;
+        const cw = chip.length * 18 + 54;
+        ctx.fillStyle = active ? '#6366f1' : (config.darkScreen ? '#1e293b' : '#e2e8f0');
+        roundRect(ctx, chipX, phoneY + 200, cw, 56, 28);
+        ctx.fill();
+        ctx.fillStyle = active ? '#ffffff' : (config.darkScreen ? '#cbd5e1' : '#475569');
+        ctx.font = '600 24px Inter, sans-serif';
+        ctx.fillText(chip, chipX + 27, phoneY + 236);
+        chipX += cw + 16;
+      });
+
+      // Task Cards inside Phone
+      let cardY = phoneY + 295;
+      config.tasks.forEach(t => {
+        ctx.fillStyle = config.darkScreen ? '#1e293b' : '#ffffff';
+        roundRect(ctx, phoneX + 55, cardY, phoneW - 110, 185, 28);
+        ctx.fill();
+
+        // Priority left stripe
+        ctx.fillStyle = t.color;
+        roundRect(ctx, phoneX + 55, cardY, 14, 185, 7);
+        ctx.fill();
+
+        // Checkbox circle
+        ctx.strokeStyle = t.done ? '#10b981' : '#6366f1';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(phoneX + 118, cardY + 72, 22, 0, Math.PI * 2);
+        ctx.stroke();
+        if (t.done) {
+          ctx.fillStyle = '#10b981';
+          ctx.fill();
+        }
+
+        // Task Title
+        ctx.fillStyle = config.darkScreen ? '#f8fafc' : '#0f172a';
+        ctx.font = '700 32px Inter, sans-serif';
+        ctx.fillText(t.title, phoneX + 165, cardY + 80);
+
+        // Badges
+        ctx.fillStyle = config.darkScreen ? 'rgba(99,102,241,0.22)' : '#eef2ff';
+        roundRect(ctx, phoneX + 165, cardY + 108, 220, 44, 12);
+        ctx.fill();
+        ctx.fillStyle = config.darkScreen ? '#a5b4fc' : '#4f46e5';
+        ctx.font = '600 22px Inter, sans-serif';
+        ctx.fillText(t.meta1, phoneX + 185, cardY + 137);
+
+        ctx.fillStyle = config.darkScreen ? 'rgba(16,185,129,0.2)' : '#ecfdf5';
+        roundRect(ctx, phoneX + 405, cardY + 108, 240, 44, 12);
+        ctx.fill();
+        ctx.fillStyle = config.darkScreen ? '#34d399' : '#059669';
+        ctx.fillText(t.meta2, phoneX + 425, cardY + 137);
+
+        cardY += 215;
+      });
+
+      // Bottom Tab Bar inside Phone
+      const navY = phoneY + phoneH - 125;
+      ctx.fillStyle = config.darkScreen ? '#0f172a' : '#ffffff';
+      roundRect(ctx, phoneX, navY, phoneW, 125, 40);
+      ctx.fill();
+
+      const tabs = ['All Tasks', 'Today', 'Upcoming', 'Completed'];
+      tabs.forEach((tab, i) => {
+        const tx = phoneX + (phoneW / 4) * i + (phoneW / 8);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = i === 0 ? '#6366f1' : '#64748b';
+        ctx.font = '700 24px Inter, sans-serif';
+        ctx.fillText(tab, tx, navY + 75);
+      });
+    }
+
+    function initScreenshots() {
+      renderPromoScreenshot('shotCanvas1', {
+        bgStart: '#4f46e5',
+        bgEnd: '#1e1b4b',
+        tag: 'Pulse ToDo',
+        titleLine1: 'Organize Your Day',
+        titleLine2: 'With Zero Friction',
+        subtitle: 'Fast task capture, due dates & smart priority views',
+        darkScreen: false,
+        viewTitle: 'Today Focus',
+        viewSub: '4 tasks scheduled for today',
+        activeChip: 1,
+        tasks: [
+          { title: 'Prepare Q4 product launch deck', meta1: '📅 Due Today', meta2: '⚡ High Priority', color: '#ef4444', done: false },
+          { title: '15-minute morning mindfulness', meta1: '🔁 Daily', meta2: '💚 Health', color: '#10b981', done: true },
+          { title: 'Review mobile release checklist', meta1: '📅 Due Today', meta2: '💼 Work', color: '#6366f1', done: false },
+          { title: 'Pick up fresh groceries for dinner', meta1: '📅 Due Today', meta2: '🛒 Shopping', color: '#f59e0b', done: false }
+        ]
+      });
+
+      renderPromoScreenshot('shotCanvas2', {
+        bgStart: '#7c3aed',
+        bgEnd: '#1e1b4b',
+        tag: 'Recurring Habits',
+        titleLine1: 'Build Routines That',
+        titleLine2: 'Repeat Automatically',
+        subtitle: 'Daily, Weekday, Weekly, Monthly & Yearly schedules',
+        darkScreen: false,
+        viewTitle: 'Recurring Routines',
+        viewSub: 'Auto-advances when marked complete',
+        activeChip: 0,
+        tasks: [
+          { title: 'Team standup & sprint sync', meta1: '🔁 Weekdays', meta2: '💼 Work', color: '#6366f1', done: false },
+          { title: 'Strength training & cardio 45m', meta1: '🔁 Weekly', meta2: '💚 Health', color: '#10b981', done: false },
+          { title: 'Review monthly savings budget', meta1: '🔁 Monthly', meta2: '💰 Finance', color: '#8b5cf6', done: false },
+          { title: 'Drink 2L of water throughout day', meta1: '🔁 Daily', meta2: '💚 Health', color: '#10b981', done: true }
+        ]
+      });
+
+      renderPromoScreenshot('shotCanvas3', {
+        bgStart: '#0ea5e9',
+        bgEnd: '#0f172a',
+        tag: 'Smart Categories',
+        titleLine1: 'Color-Code Every',
+        titleLine2: 'Part Of Your Life',
+        subtitle: 'One-tap filtering across Work, Personal & Custom tags',
+        darkScreen: false,
+        viewTitle: 'Work & Projects',
+        viewSub: 'Filtered by category & priority',
+        activeChip: 3,
+        tasks: [
+          { title: 'Publish Pulse ToDo to App Stores', meta1: '📅 Today', meta2: '⚡ High Priority', color: '#ef4444', done: false },
+          { title: 'Approve UI usability upgrades', meta1: '📅 Completed', meta2: '💼 Work', color: '#10b981', done: true },
+          { title: 'Update quarterly roadmap metrics', meta1: '📅 Tomorrow', meta2: '💼 Work', color: '#6366f1', done: false },
+          { title: 'Sync customer feedback notes', meta1: '🔁 Weekly', meta2: '💼 Work', color: '#f59e0b', done: false }
+        ]
+      });
+
+      renderPromoScreenshot('shotCanvas4', {
+        bgStart: '#1e293b',
+        bgEnd: '#090d16',
+        tag: 'Dark Mode & Offline',
+        titleLine1: 'Designed For Focus',
+        titleLine2: '100% Private & Offline',
+        subtitle: 'Instant Dark Mode with local on-device storage',
+        darkScreen: true,
+        viewTitle: 'All Tasks',
+        viewSub: 'Stored privately on your device',
+        activeChip: 0,
+        tasks: [
+          { title: 'Evening reading — 25 pages', meta1: '🔁 Daily', meta2: '🏠 Personal', color: '#8b5cf6', done: false },
+          { title: 'Plan weekend coastal hike', meta1: '📅 Saturday', meta2: '💚 Health', color: '#10b981', done: false },
+          { title: 'Backup project keystore file', meta1: '📅 Today', meta2: '⚡ High Priority', color: '#ef4444', done: true },
+          { title: 'Order wireless travel charger', meta1: '📅 Friday', meta2: '🛒 Shopping', color: '#f59e0b', done: false }
+        ]
+      });
+    }
+
+    function downloadCanvas(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    document.getElementById('downloadAllShotsBtn').addEventListener('click', () => {
+      const shots = [
+        ['shotCanvas1', 'pulse-todo-screenshot-1-today.png'],
+        ['shotCanvas2', 'pulse-todo-screenshot-2-recurring.png'],
+        ['shotCanvas3', 'pulse-todo-screenshot-3-categories.png'],
+        ['shotCanvas4', 'pulse-todo-screenshot-4-darkmode.png']
+      ];
+      shots.forEach(([id, name], idx) => {
+        setTimeout(() => downloadCanvas(id, name), idx * 300);
+      });
+    });
+
+    // 4. 1-Click Auto-Upload to GitHub Handler (Runs via Browser's HTTPS/Proxy Connection)
+    const autoPushBtn = document.getElementById('autoPushGithubBtn');
+    const ghStatusEl = document.getElementById('ghPushStatus');
+    if (autoPushBtn) {
+      autoPushBtn.addEventListener('click', async () => {
+        const token = document.getElementById('ghTokenInput').value.trim();
+        const repoName = (document.getElementById('ghRepoInput').value.trim() || 'pulse-todo').replace(/[^a-zA-Z0-9._-]/g, '-');
+
+        ghStatusEl.style.display = 'block';
+        if (!token) {
+          ghStatusEl.style.background = 'rgba(239, 68, 68, 0.16)';
+          ghStatusEl.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+          ghStatusEl.style.color = '#fca5a5';
+          ghStatusEl.innerHTML = '⚠️ Please paste your GitHub Personal Access Token first (click the blue link above to generate one in 5 seconds).';
+          return;
+        }
+
+        const ghApi = async (apiPath, options = {}) => {
+          const resp = await fetch(`https://api.github.com${apiPath}`, {
+            method: options.method || 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+              ...(options.body ? { 'Content-Type': 'application/json' } : {})
+            },
+            body: options.body ? JSON.stringify(options.body) : undefined
+          });
+          const text = await resp.text();
+          let data = {};
+          try { data = text ? JSON.parse(text) : {}; } catch (e) {}
+          return { ok: resp.ok, status: resp.status, data };
+        };
+
+        autoPushBtn.disabled = true;
+        const origLabel = autoPushBtn.innerHTML;
+        autoPushBtn.innerHTML = '⏳ Uploading to GitHub...';
+        ghStatusEl.style.background = 'rgba(99, 102, 241, 0.16)';
+        ghStatusEl.style.border = '1px solid rgba(99, 102, 241, 0.4)';
+        ghStatusEl.style.color = '#c7d2fe';
+        ghStatusEl.innerHTML = '⏳ Step 1/4: Reading 22 project files from local server...';
+
+        try {
+          // 1. Read project files from localhost
+          const localResp = await fetch('/api/project-files');
+          if (!localResp.ok) {
+            throw new Error('Could not read local project files from localhost:3000.');
+          }
+          const { files } = await localResp.json();
+
+          // 2. Verify GitHub User via Browser HTTPS
+          ghStatusEl.innerHTML = '⏳ Step 2/4: Verifying GitHub account...';
+          const userRes = await ghApi('/user');
+          if (!userRes.ok || !userRes.data.login) {
+            throw new Error(userRes.data.message || 'Invalid GitHub token. Please check that you pasted the full ghp_... token.');
+          }
+          const owner = userRes.data.login;
+
+          // 3. Ensure repository exists & is initialized
+          ghStatusEl.innerHTML = `⏳ Step 3/4: Preparing repository <strong>${owner}/${repoName}</strong>...`;
+          let repoRes = await ghApi(`/repos/${owner}/${repoName}`);
+          if (!repoRes.ok) {
+            const createRes = await ghApi('/user/repos', {
+              method: 'POST',
+              body: {
+                name: repoName,
+                description: 'Pulse ToDo — Mobile & Web Task Manager (Android & iOS)',
+                private: false,
+                auto_init: true
+              }
+            });
+            if (!createRes.ok) {
+              throw new Error(createRes.data.message || 'Failed to create repository on GitHub.');
+            }
+            repoRes = createRes;
+            await new Promise(r => setTimeout(r, 1500));
+          }
+
+          const defaultBranch = repoRes.data.default_branch || 'main';
+          let refRes = await ghApi(`/repos/${owner}/${repoName}/git/ref/heads/${defaultBranch}`);
+          if (!refRes.ok) {
+            // Repo was created empty on github.com/new -> initialize with README.md
+            await ghApi(`/repos/${owner}/${repoName}/contents/README.md`, {
+              method: 'PUT',
+              body: {
+                message: 'Initialize Pulse ToDo repository',
+                content: btoa('# Pulse ToDo — Mobile & Web Task Manager\n')
+              }
+            });
+            await new Promise(r => setTimeout(r, 1200));
+            refRes = await ghApi(`/repos/${owner}/${repoName}/git/ref/heads/${defaultBranch}`);
+          }
+
+          const latestCommitSha = refRes.data && refRes.data.object ? refRes.data.object.sha : null;
+          if (!latestCommitSha) {
+            throw new Error('Could not read repository branch HEAD.');
+          }
+
+          // 4. Upload all 22 files as Git blobs
+          const treeItems = [];
+          for (let i = 0; i < files.length; i++) {
+            const f = files[i];
+            ghStatusEl.innerHTML = `⏳ Step 4/4: Uploading file ${i + 1} of ${files.length} (<code>${f.path}</code>)...`;
+            const blobRes = await ghApi(`/repos/${owner}/${repoName}/git/blobs`, {
+              method: 'POST',
+              body: {
+                content: f.contentBase64,
+                encoding: 'base64'
+              }
+            });
+            if (!blobRes.ok) {
+              throw new Error(`Failed uploading ${f.path}: ${blobRes.data.message || 'GitHub error'}`);
+            }
+            treeItems.push({
+              path: f.path,
+              mode: '100644',
+              type: 'blob',
+              sha: blobRes.data.sha
+            });
+          }
+
+          ghStatusEl.innerHTML = '⏳ Finalizing commit &amp; starting GitHub Actions mobile build...';
+          const treeRes = await ghApi(`/repos/${owner}/${repoName}/git/trees`, {
+            method: 'POST',
+            body: { base_tree: latestCommitSha, tree: treeItems }
+          });
+          if (!treeRes.ok) {
+            throw new Error(treeRes.data.message || 'Failed creating Git tree.');
+          }
+
+          const commitRes = await ghApi(`/repos/${owner}/${repoName}/git/commits`, {
+            method: 'POST',
+            body: {
+              message: 'Publish Pulse ToDo v1.0.0 mobile app & store release workflow',
+              tree: treeRes.data.sha,
+              parents: [latestCommitSha]
+            }
+          });
+          if (!commitRes.ok) {
+            throw new Error(commitRes.data.message || 'Failed creating Git commit.');
+          }
+
+          const updateRefRes = await ghApi(`/repos/${owner}/${repoName}/git/refs/heads/${defaultBranch}`, {
+            method: 'PATCH',
+            body: { sha: commitRes.data.sha, force: true }
+          });
+          if (!updateRefRes.ok) {
+            throw new Error(`${updateRefRes.data.message || 'Failed updating branch.'} — Make sure the "workflow" checkbox is ticked on your GitHub token.`);
+          }
+
+          // Trigger workflow_dispatch
+          await ghApi(`/repos/${owner}/${repoName}/actions/workflows/mobile-release.yml/dispatches`, {
+            method: 'POST',
+            body: { ref: defaultBranch }
+          });
+
+          const repoUrl = `https://github.com/${owner}/${repoName}`;
+          const actionsUrl = `https://github.com/${owner}/${repoName}/actions`;
+
+          ghStatusEl.style.background = 'rgba(16, 185, 129, 0.16)';
+          ghStatusEl.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+          ghStatusEl.style.color = '#6ee7b7';
+          ghStatusEl.innerHTML = `
+            ✅ <strong>Success! Uploaded ${files.length} files to <a href="${repoUrl}" target="_blank" style="color:#fff;text-decoration:underline;">${owner}/${repoName}</a>!</strong><br>
+            🎉 Your cloud Android &amp; iOS build is now running! 👉 <a href="${actionsUrl}" target="_blank" style="color:#fff;font-weight:700;text-decoration:underline;">Click here to open GitHub Actions &amp; download your signed .AAB bundle</a> (takes ~3 mins).
+          `;
+
+          const step1Cb = document.querySelector('input[data-step="gp-1"]');
+          if (step1Cb && !step1Cb.checked) {
+            step1Cb.checked = true;
+            step1Cb.dispatchEvent(new Event('change'));
+          }
+        } catch (err) {
+          ghStatusEl.style.background = 'rgba(239, 68, 68, 0.16)';
+          ghStatusEl.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+          ghStatusEl.style.color = '#fca5a5';
+          ghStatusEl.innerHTML = `❌ <strong>Error:</strong> ${err.message}`;
+        } finally {
+          autoPushBtn.disabled = false;
+          autoPushBtn.innerHTML = origLabel;
+        }
+      });
+    }
+
+    initScreenshots();
+  </script>
+</body>
+</html>

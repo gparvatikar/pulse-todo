@@ -1,0 +1,46 @@
+# Codemagic Cloud CI/CD Configuration for Pulse ToDo
+# Allows building, signing, and publishing iOS (.ipa) to Apple App Store Connect
+# and Android (.aab) to Google Play directly from a Windows laptop (No Mac required).
+
+workflows:
+  ios-app-store-release:
+    name: Pulse ToDo — iOS App Store Connect Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic_AppStoreConnect
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.pulsetodo.app
+      vars:
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Install dependencies & generate store icons
+        script: |
+          npm install
+          npm run icons:generate
+      - name: Add & Sync Capacitor iOS platform
+        script: |
+          if [ ! -d "ios" ]; then npx cap add ios; fi
+          npx cap sync ios
+          cp public/icons/icon-1024.png ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles --project ios/App/App.xcodeproj
+      - name: Build signed ipa for App Store Connect
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false

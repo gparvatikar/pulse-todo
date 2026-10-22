@@ -1,0 +1,31 @@
+{
+  "name": "pulse-todo-app",
+  "version": "1.0.0",
+  "description": "Modern & clean ToDo App with SQLite backend, on-device offline storage, due dates, recurring tasks, and Capacitor iOS/Android mobile builds",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "icons:generate": "node scripts/generate-icons.js",
+    "mobile:init": "npx cap add android && npx cap add ios",
+    "mobile:sync": "node scripts/generate-icons.js && npx cap sync",
+    "mobile:android": "npx cap sync android && npx cap open android",
+    "mobile:ios": "npx cap sync ios && npx cap open ios",
+    "android:bundle": "cd android && ./gradlew bundleRelease",
+    "android:apk": "cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
+    "@capacitor/splash-screen": "^6.0.3",
+    "@capacitor/status-bar": "^6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

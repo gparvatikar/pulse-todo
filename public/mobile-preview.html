@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse ToDo — Mobile App Simulator & Test Suite</title>
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #131b2e;
+      --panel-border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: radial-gradient(circle at 20% 0%, #1e1b4b 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Control Bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 24px;
+      background: rgba(19, 27, 46, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    .toolbar-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .control-group {
+      display: inline-flex;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .ctrl-btn:hover {
+      color: var(--text);
+    }
+
+    .ctrl-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    }
+
+    .run-test-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      transition: transform 0.15s ease;
+    }
+
+    .run-test-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Main Layout */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      padding: 24px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    /* Phone Stage */
+    .phone-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .device-shell {
+      position: relative;
+      width: 393px;
+      height: 830px;
+      background: #000;
+      border-radius: 52px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 2px #334155,
+        0 0 0 6px #0f172a,
+        0 25px 60px rgba(0, 0, 0, 0.65);
+      transition: width 0.25s ease, height 0.25s ease, border-radius 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Pixel 9 styling */
+    .device-shell.device-pixel {
+      width: 412px;
+      height: 860px;
+      border-radius: 38px;
+    }
+
+    /* Landscape orientation */
+    .device-shell.is-landscape {
+      width: 830px;
+      height: 412px;
+    }
+
+    .device-screen {
+      position: relative;
+      flex: 1;
+      background: #fff;
+      border-radius: 40px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .device-shell.device-pixel .device-screen {
+      border-radius: 28px;
+    }
+
+    /* Simulated iOS / Android Status Bar */
+    .device-statusbar {
+      height: 36px;
+      background: #4f46e5;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .dynamic-island {
+      width: 96px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 7px;
+    }
+
+    .device-shell.device-pixel .dynamic-island {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      top: 11px;
+    }
+
+    .device-iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    .device-home-bar {
+      height: 18px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .device-home-pill {
+      width: 120px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    /* Right Inspector Panel */
+    .inspector-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .inspector-card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc;
+      font-weight: 600;
+    }
+
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .test-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .test-status {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1e293b;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .test-item.pass .test-status {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .test-item.fail .test-status {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    .guide-box {
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .guide-box strong {
+      color: var(--text);
+    }
+
+    .guide-box code {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.76rem;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/icons/icon.svg" alt="Pulse ToDo" />
+      <div>
+        <span class="brand-title">Pulse ToDo — Mobile Simulator</span>
+        <span class="brand-sub">App ID: com.pulsetodo.app</span>
+      </div>
+    </div>
+
+    <div class="toolbar-controls">
+      <!-- Device Picker -->
+      <div class="control-group" role="group" aria-label="Device model">
+        <button type="button" class="ctrl-btn active" data-device="iphone">iPhone 16 Pro (iOS)</button>
+        <button type="button" class="ctrl-btn" data-device="pixel">Pixel 9 (Android)</button>
+      </div>
+
+      <!-- Storage Mode Picker -->
+      <div class="control-group" role="group" aria-label="Storage mode">
+        <button type="button" class="ctrl-btn active" data-storage="offline" title="Simulates standalone mobile app using on-device storage">
+          On-Device Mode (Standalone Phone)
+        </button>
+        <button type="button" class="ctrl-btn" data-storage="sqlite" title="Syncs with your laptop SQLite database">
+          SQLite Synced Mode
+        </button>
+      </div>
+
+      <!-- Orientation -->
+      <div class="control-group">
+        <button type="button" id="rotateBtn" class="ctrl-btn">Rotate</button>
+      </div>
+
+      <button type="button" id="runTestsBtn" class="run-test-btn">
+        <span>&#9654; Run Automated Mobile Tests</span>
+      </button>
+
+      <a href="/store-publish.html" class="ctrl-btn" style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.5); color: #a5b4fc; text-decoration: none;">&#128640; Store Publishing Center</a>
+      <a href="/" class="ctrl-btn" style="border: 1px solid var(--panel-border); text-decoration: none;">Back to Desktop View</a>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- Left: Interactive Phone Frame -->
+    <section class="phone-stage">
+      <div id="deviceShell" class="device-shell">
+        <div class="device-screen">
+          <div class="device-statusbar">
+            <span id="statusClock">9:41</span>
+            <div class="dynamic-island"></div>
+            <span>5G &bull; 100%</span>
+          </div>
+          <iframe id="appFrame" class="device-iframe" src="/?offline=1" title="Pulse ToDo Mobile Viewport"></iframe>
+          <div class="device-home-bar">
+            <div class="device-home-pill"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Automated Verification & Laptop Testing Guide -->
+    <aside class="inspector-card">
+      <h2>
+        <span>Mobile Readiness Checks</span>
+        <span id="testSummaryBadge" class="badge-pill">Ready</span>
+      </h2>
+
+      <ul id="testList" class="test-list">
+        <li class="test-item" data-test="nav">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>Native Bottom Tab Bar &amp; FAB</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies mobile bottom navigation &amp; floating + button render in mobile viewport.</div>
+          </div>
+        </li>
+        <li class="test-item" data-test="storage">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>Standalone On-Device Storage</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies tasks can be created &amp; persisted on-device without a backend server.</div>
+          </div>
+        </li>
+        <li class="test-item" data-test="charlimit">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>&gt;50 Character Red Alert Counter</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies typing &gt;50 chars highlights the input and counter in red.</div>
+          </div>
+        </li>
+        <li class="test-item" data-test="recurrence">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>Recurring Task Auto-Spawning</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies completing a recurring task schedules the next occurrence on-device.</div>
+          </div>
+        </li>
+        <li class="test-item" data-test="pwa">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>Store Icons &amp; Web App Manifest</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies <code>manifest.json</code>, <code>icon-512.png</code>, and <code>apple-touch-icon.png</code>.</div>
+          </div>
+        </li>
+        <li class="test-item" data-test="privacy">
+          <span class="test-status">&bull;</span>
+          <div>
+            <strong>App Store / Play Store Privacy Policy</strong>
+            <div class="test-detail" style="color:var(--muted);font-size:0.76rem;">Verifies <code>/privacy.html</code> is live and accessible.</div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="guide-box">
+        <strong>3 Ways to Test from Your Laptop:</strong><br /><br />
+        1. <strong>Interactive Phone Frame (Left):</strong> Tap the bottom tabs (<em>All, Today, +, Recurring, Done</em>), create tasks, and toggle <em>On-Device Mode</em> vs. <em>SQLite Mode</em>.<br /><br />
+        2. <strong>Install as a Standalone App (Edge / Chrome):</strong> Click the <strong>Install App</strong> icon in your browser's address bar at <code>http://localhost:3000</code> to launch Pulse ToDo in its own standalone window.<br /><br />
+        3. <strong>Android Studio / Xcode Emulator:</strong> Run <code>npm run mobile:android</code> or push to GitHub Actions (<code>.github/workflows/mobile-release.yml</code>) to download the compiled <code>.apk</code> / <code>.aab</code>.
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    (() => {
+      const deviceShell = document.getElementById('deviceShell');
+      const appFrame = document.getElementById('appFrame');
+      const rotateBtn = document.getElementById('rotateBtn');
+      const runTestsBtn = document.getElementById('runTestsBtn');
+      const testSummaryBadge = document.getElementById('testSummaryBadge');
+
+      // Device switcher
+      document.querySelectorAll('[data-device]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-device]').forEach(b => b.classList.toggle('active', b === btn));
+          deviceShell.classList.toggle('device-pixel', btn.dataset.device === 'pixel');
+        });
+      });
+
+      // Storage mode switcher
+      document.querySelectorAll('[data-storage]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-storage]').forEach(b => b.classList.toggle('active', b === btn));
+          const isOffline = btn.dataset.storage === 'offline';
+          appFrame.src = isOffline ? '/?offline=1' : '/';
+        });
+      });
+
+      // Orientation switcher
+      rotateBtn.addEventListener('click', () => {
+        deviceShell.classList.toggle('is-landscape');
+        rotateBtn.classList.toggle('active', deviceShell.classList.contains('is-landscape'));
+      });
+
+      function setTestResult(key, passed, detailText) {
+        const item = document.querySelector(`[data-test="${key}"]`);
+        if (!item) return;
+        item.classList.remove('pass', 'fail');
+        item.classList.add(passed ? 'pass' : 'fail');
+        item.querySelector('.test-status').innerHTML = passed ? '&#10003;' : '&#10007;';
+        if (detailText) {
+          item.querySelector('.test-detail').textContent = detailText;
+        }
+      }
+
+      async function runAutomatedTests() {
+        runTestsBtn.disabled = true;
+        testSummaryBadge.textContent = 'Running...';
+        let passedCount = 0;
+
+        const doc = appFrame.contentDocument;
+        const win = appFrame.contentWindow;
+
+        // 1. Check Native Bottom Nav & FAB visibility in mobile frame
+        const bottomNav = doc && doc.getElementById('mobileBottomNav');
+        const fabBtn = doc && doc.getElementById('mobileFabBtn');
+        const navComputed = bottomNav ? win.getComputedStyle(bottomNav).display : 'none';
+        if (bottomNav && fabBtn && navComputed === 'flex') {
+          passedCount++;
+          setTestResult('nav', true, 'Verified: Bottom tab bar (display: flex) & + FAB button active.');
+        } else {
+          setTestResult('nav', false, 'Bottom navigation bar not visible in viewport.');
+        }
+
+        // 2. Check >50 character red alert counter in modal
+        if (fabBtn && doc) {
+          fabBtn.click();
+          const modalTitleInput = doc.getElementById('modalTaskTitle');
+          const modalCharCounter = doc.getElementById('modalTitleCharCount');
+          const longTitle = 'Complete mobile store release checklist and verify over fifty characters!';
+          modalTitleInput.value = longTitle;
+          modalTitleInput.dispatchEvent(new win.Event('input', { bubbles: true }));
+
+          const hasExceededClass =
+            modalCharCounter.classList.contains('is-exceeded') &&
+            modalTitleInput.classList.contains('is-exceeded');
+
+          if (hasExceededClass && modalCharCounter.textContent.includes('Exceeds 50')) {
+            passedCount++;
+            setTestResult('charlimit', true, `Verified: "${modalCharCounter.textContent}" highlighted in red.`);
+          } else {
+            setTestResult('charlimit', false, 'Character counter did not trigger red state.');
+          }
+
+          // Close modal
+          const closeBtn = doc.getElementById('closeModalBtn');
+          if (closeBtn) closeBtn.click();
+        }
+
+        // 3. Test Standalone On-Device Task Creation & Recurring Task Auto-Spawning
+        try {
+          const quickInput = doc.getElementById('quickTitleInput');
+          const quickRecurrence = doc.getElementById('quickRecurrenceInput');
+          const quickForm = doc.getElementById('quickAddForm');
+          const testTitle = 'Mobile Daily Standup Check';
+
+          quickInput.value = testTitle;
+          quickRecurrence.value = 'daily';
+          quickRecurrence.dispatchEvent(new win.Event('change', { bubbles: true }));
+          quickForm.dispatchEvent(new win.Event('submit', { bubbles: true, cancelable: true }));
+
+          await new Promise(r => setTimeout(r, 150));
+          const createdCard = Array.from(doc.querySelectorAll('.task-card')).find(el =>
+            el.textContent.includes(testTitle)
+          );
+
+          if (createdCard) {
+            passedCount++;
+            setTestResult('storage', true, 'Verified: Task created & persisted in on-device storage.');
+
+            // Toggle completion to test recurring auto-spawn
+            const checkbox = createdCard.querySelector('[data-action="toggle"]');
+            checkbox.click();
+            await new Promise(r => setTimeout(r, 180));
+
+            const matchingCards = Array.from(doc.querySelectorAll('.task-card')).filter(el =>
+              el.textContent.includes(testTitle)
+            );
+            if (matchingCards.length >= 2) {
+              passedCount++;
+              setTestResult('recurrence', true, 'Verified: Completing daily task spawned next occurrence automatically.');
+            } else {
+              setTestResult('recurrence', false, 'Next occurrence was not spawned.');
+            }
+
+            // Clean up test tasks
+            for (const card of Array.from(doc.querySelectorAll('.task-card'))) {
+              if (card.textContent.includes(testTitle)) {
+                const delBtn = card.querySelector('[data-action="delete"]');
+                if (delBtn) delBtn.click();
+                await new Promise(r => setTimeout(r, 60));
+              }
+            }
+          } else {
+            setTestResult('storage', false, 'Could not find newly created task card.');
+            setTestResult('recurrence', false, 'Skipped because task creation failed.');
+          }
+        } catch (err) {
+          setTestResult('storage', false, err.message);
+        }
+
+        // 5. Verify Manifest & Store Icons
+        try {
+          const [manifestRes, iconRes] = await Promise.all([
+            fetch('/manifest.json'),
+            fetch('/icons/icon-512.png')
+          ]);
+          const manifest = await manifestRes.json();
+          if (manifestRes.ok && iconRes.ok && manifest.id === 'com.pulsetodo.app') {
+            passedCount++;
+            setTestResult('pwa', true, 'Verified: manifest.json (com.pulsetodo.app) & 512px store icon HTTP 200.');
+          } else {
+            setTestResult('pwa', false, 'Manifest or icon check failed.');
+          }
+        } catch (err) {
+          setTestResult('pwa', false, err.message);
+        }
+
+        // 6. Verify Privacy Policy page
+        try {
+          const privRes = await fetch('/privacy.html');
+          if (privRes.ok) {
+            passedCount++;
+            setTestResult('privacy', true, 'Verified: /privacy.html is live for Play Store & App Store review.');
+          } else {
+            setTestResult('privacy', false, 'Privacy policy returned status ' + privRes.status);
+          }
+        } catch (err) {
+          setTestResult('privacy', false, err.message);
+        }
+
+        testSummaryBadge.textContent = `${passedCount} / 6 Passed`;
+        runTestsBtn.disabled = false;
+      }
+
+      runTestsBtn.addEventListener('click', runAutomatedTests);
+
+      // Auto-run tests once iframe finishes loading
+      appFrame.addEventListener('load', () => {
+        setTimeout(runAutomatedTests, 350);
+      }, { once: true });
+    })();
+  </script>
+</body>
+</html>

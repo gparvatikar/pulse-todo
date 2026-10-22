@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pulse ToDo" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Pulse — Modern ToDo & Recurring Tasks</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Mobile Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop hidden"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Pulse</span>
+          <span class="brand-subtitle">Task Workspace</span>
+        </div>
+        <button id="closeSidebarBtn" class="icon-btn mobile-only" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-action">
+        <button id="openNewTaskModalBtn" class="btn btn-primary btn-block">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Task</span>
+          <kbd class="shortcut-Hint">N</kbd>
+        </button>
+      </div>
+
+      <!-- Views Navigation -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">
+          <span>VIEWS</span>
+        </div>
+        <nav id="viewNav" class="nav-list" aria-label="Task Views">
+          <button class="nav-item active" data-view="all">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <line x1="7" y1="9" x2="17" y2="9"></line>
+                <line x1="7" y1="13" x2="17" y2="13"></line>
+                <line x1="7" y1="17" x2="13" y2="17"></line>
+              </svg>
+              <span>All Tasks</span>
+            </span>
+            <span class="badge" id="count-all">0</span>
+          </button>
+
+          <button class="nav-item" data-view="today">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+              </svg>
+              <span>Today</span>
+            </span>
+            <span class="badge" id="count-today">0</span>
+          </button>
+
+          <button class="nav-item" data-view="overdue">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>Overdue</span>
+            </span>
+            <span class="badge badge-danger" id="count-overdue">0</span>
+          </button>
+
+          <button class="nav-item" data-view="upcoming">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Upcoming</span>
+            </span>
+            <span class="badge" id="count-upcoming">0</span>
+          </button>
+
+          <button class="nav-item" data-view="recurring">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Recurring</span>
+            </span>
+            <span class="badge" id="count-recurring">0</span>
+          </button>
+
+          <button class="nav-item" data-view="completed">
+            <span class="nav-item-left">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Completed</span>
+            </span>
+            <span class="badge" id="count-completed">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Categories Section -->
+      <div class="sidebar-section categories-section">
+        <div class="sidebar-section-header">
+          <span>CATEGORIES</span>
+          <button id="toggleAddCategoryBtn" class="icon-btn-sm" title="Add new category" aria-label="Add new category">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Inline Category Creator -->
+        <form id="addCategoryForm" class="category-creator hidden">
+          <div class="category-creator-row">
+            <input type="text" id="newCategoryName" placeholder="Category name..." maxlength="24" required />
+            <button type="submit" class="btn btn-sm btn-primary">Add</button>
+          </div>
+          <div id="colorSwatches" class="color-swatches">
+            <button type="button" class="color-swatch selected" data-color="#6366f1" style="background:#6366f1" aria-label="Indigo"></button>
+            <button type="button" class="color-swatch" data-color="#0ea5e9" style="background:#0ea5e9" aria-label="Sky"></button>
+            <button type="button" class="color-swatch" data-color="#10b981" style="background:#10b981" aria-label="Emerald"></button>
+            <button type="button" class="color-swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="Amber"></button>
+            <button type="button" class="color-swatch" data-color="#ef4444" style="background:#ef4444" aria-label="Red"></button>
+            <button type="button" class="color-swatch" data-color="#ec4899" style="background:#ec4899" aria-label="Pink"></button>
+            <button type="button" class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6" aria-label="Violet"></button>
+            <button type="button" class="color-swatch" data-color="#14b8a6" style="background:#14b8a6" aria-label="Teal"></button>
+          </div>
+        </form>
+
+        <div id="categoryNav" class="nav-list category-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Sidebar Footer: Daily Progress & Theme Toggle -->
+      <div class="sidebar-footer">
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-label">Active Completion</span>
+            <span id="progressPercent" class="progress-value">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-fill" style="width: 0%"></div>
+          </div>
+          <div id="progressSubtext" class="progress-subtext">0 of 0 tasks completed</div>
+        </div>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle color theme">
+          <span class="theme-icon-wrap">
+            <svg id="sunIcon" class="hidden" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+          <span id="themeToggleText">Dark Mode</span>
+        </button>
+
+        <div class="sidebar-meta-row">
+          <span id="storageModeBadge" class="storage-mode-badge" title="Storage status">
+            <span class="storage-dot"></span>
+            <span id="storageModeText">Synced (SQLite + Device)</span>
+          </span>
+          <span>
+            <a href="/store-publish.html" class="privacy-link" style="margin-right: 8px; font-weight: 600;">Publish</a>
+            <a href="/mobile-preview.html" class="privacy-link" style="margin-right: 8px;">Mobile Sim</a>
+            <a href="/privacy.html" class="privacy-link">Privacy</a>
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button id="openSidebarBtn" class="icon-btn mobile-only" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div>
+            <div class="view-title-row">
+              <h1 id="currentViewTitle" class="view-title">All Tasks</h1>
+              <span id="activeCategoryPill" class="active-filter-pill hidden"></span>
+            </div>
+            <p id="currentDateDisplay" class="date-subtitle"></p>
+          </div>
+        </div>
+
+        <!-- Mobile Quick Header Actions (Search/Filter Toggle + Theme Toggle) -->
+        <div class="mobile-header-actions mobile-only">
+          <button type="button" id="mobileSearchToggleBtn" class="icon-btn" aria-label="Toggle search and filters" title="Search & Filter">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <button type="button" id="mobileThemeToggleBtn" class="icon-btn" aria-label="Toggle color theme" title="Toggle Dark/Light Mode">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="headerControls" class="header-controls">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="search" id="searchInput" placeholder="Search tasks, notes, tags..." autocomplete="off" />
+          </div>
+
+          <div class="filter-group">
+            <select id="priorityFilter" class="control-select" aria-label="Filter by priority">
+              <option value="all">All Priorities</option>
+              <option value="high">High Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="low">Low Priority</option>
+            </select>
+
+            <select id="sortSelect" class="control-select" aria-label="Sort tasks">
+              <option value="due_date">Sort: Due Date</option>
+              <option value="priority">Sort: Priority</option>
+              <option value="newest">Sort: Newest</option>
+              <option value="title">Sort: A–Z</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <!-- Mobile Horizontal Category & Quick-Filter Chip Strip -->
+      <div id="mobileChipStrip" class="mobile-chip-strip" aria-label="Quick category and status filters">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Quick Add Task Bar -->
+      <section class="quick-add-section" aria-label="Quick add task">
+        <form id="quickAddForm" class="quick-add-card">
+          <div class="quick-add-main">
+            <span class="quick-add-plus">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </span>
+            <input
+              type="text"
+              id="quickTitleInput"
+              class="quick-title-input"
+              placeholder="Add a new task..."
+              required
+              autocomplete="off"
+            />
+            <span id="quickTitleCharCount" class="char-counter hidden" aria-live="polite">0 / 50</span>
+          </div>
+          <div class="quick-add-options">
+            <div class="quick-field" title="Due Date (optional)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <input type="date" id="quickDueDateInput" aria-label="Quick task due date" />
+            </div>
+
+            <div class="quick-field" title="Recurrence">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <select id="quickRecurrenceInput" aria-label="Quick task recurrence">
+                <option value="none">No Repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="weekdays">Weekdays (Mon–Fri)</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+
+            <div class="quick-field" title="Priority">
+              <select id="quickPriorityInput" aria-label="Quick task priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+
+            <div class="quick-field" title="Category">
+              <select id="quickCategoryInput" aria-label="Quick task category">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Task List Header & Bulk Actions -->
+      <div class="list-toolbar">
+        <div id="taskCountSummary" class="task-count-summary">Showing 0 tasks</div>
+        <div class="list-toolbar-actions">
+          <button id="toggleShowCompletedBtn" class="btn btn-ghost btn-sm">
+            <span id="toggleShowCompletedText">Hide Completed</span>
+          </button>
+          <button id="clearCompletedBtn" class="btn btn-danger-ghost btn-sm hidden">
+            Clear Completed
+          </button>
+        </div>
+      </div>
+
+      <!-- Task List Container -->
+      <section id="taskListContainer" class="task-list" aria-live="polite">
+        <!-- Populated dynamically -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Add / Edit Task Modal Dialog -->
+  <div id="taskModalBackdrop" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="modalCard" class="modal-card">
+      <div id="modalGrabber" class="modal-grabber" aria-hidden="true">
+        <span class="modal-grabber-bar"></span>
+      </div>
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">New Task</h2>
+        <button id="closeModalBtn" class="icon-btn" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="taskModalForm" class="modal-body">
+        <input type="hidden" id="modalTaskId" value="" />
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <label for="modalTaskTitle" class="form-label">Task Title <span class="required">*</span></label>
+            <span id="modalTitleCharCount" class="char-counter" aria-live="polite">0 / 50</span>
+          </div>
+          <input
+            type="text"
+            id="modalTaskTitle"
+            class="form-input form-input-lg"
+            placeholder="What needs to get done?"
+            required
+            maxlength="200"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="modalTaskNotes" class="form-label">Notes / Description</label>
+          <textarea
+            id="modalTaskNotes"
+            class="form-textarea"
+            rows="3"
+            placeholder="Add extra context, links, or checklist details..."
+          ></textarea>
+        </div>
+
+        <div class="form-row-2col">
+          <!-- Due Date Field -->
+          <div class="form-group">
+            <label for="modalTaskDueDate" class="form-label">Due Date <span class="optional">(Optional)</span></label>
+            <input type="date" id="modalTaskDueDate" class="form-input" />
+            <div class="date-quick-chips">
+              <button type="button" class="chip-btn" data-date-preset="today">Today</button>
+              <button type="button" class="chip-btn" data-date-preset="tomorrow">Tomorrow</button>
+              <button type="button" class="chip-btn" data-date-preset="next_week">+7 Days</button>
+              <button type="button" class="chip-btn chip-clear" data-date-preset="clear">Clear</button>
+            </div>
+          </div>
+
+          <!-- Recurrence Field -->
+          <div class="form-group">
+            <label for="modalTaskRecurrence" class="form-label">Recurring Schedule</label>
+            <select id="modalTaskRecurrence" class="form-select">
+              <option value="none">Does not repeat</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="weekdays">Every Weekday (Mon–Fri)</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+            <div id="recurrencePreviewBox" class="recurrence-preview hidden">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span id="recurrencePreviewText"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <!-- Priority Segmented Selector -->
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <div id="modalPrioritySelector" class="segmented-control" role="radiogroup" aria-label="Task priority">
+              <button type="button" class="segment-btn" data-priority="low">
+                <span class="priority-dot dot-low"></span>Low
+              </button>
+              <button type="button" class="segment-btn active" data-priority="medium">
+                <span class="priority-dot dot-medium"></span>Medium
+              </button>
+              <button type="button" class="segment-btn" data-priority="high">
+                <span class="priority-dot dot-high"></span>High
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Selector -->
+          <div class="form-group">
+            <label for="modalTaskCategory" class="form-label">Category</label>
+            <select id="modalTaskCategory" class="form-select">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modalDeleteBtn" class="btn btn-danger-ghost hidden">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Delete Task
+          </button>
+          <div class="modal-footer-right">
+            <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="saveTaskBtn" class="btn btn-primary">Save Task</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (iOS & Android Native Feel) -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <button type="button" class="mobile-tab-btn active" data-view="all" data-mobile-view="all">
+      <span class="mobile-tab-icon-wrap">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+          <line x1="7" y1="9" x2="17" y2="9"></line>
+          <line x1="7" y1="13" x2="17" y2="13"></line>
+        </svg>
+        <span id="mobile-badge-all" class="mobile-tab-badge hidden">0</span>
+      </span>
+      <span>All</span>
+    </button>
+    <button type="button" class="mobile-tab-btn" data-view="today" data-mobile-view="today">
+      <span class="mobile-tab-icon-wrap">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+        </svg>
+        <span id="mobile-badge-today" class="mobile-tab-badge hidden">0</span>
+      </span>
+      <span>Today</span>
+    </button>
+    <button type="button" id="mobileFabBtn" class="mobile-fab-btn" aria-label="New Task">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+    <button type="button" class="mobile-tab-btn" data-view="recurring" data-mobile-view="recurring">
+      <span class="mobile-tab-icon-wrap">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        <span id="mobile-badge-recurring" class="mobile-tab-badge hidden">0</span>
+      </span>
+      <span>Repeat</span>
+    </button>
+    <button type="button" class="mobile-tab-btn" data-view="completed" data-mobile-view="completed">
+      <span class="mobile-tab-icon-wrap">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span id="mobile-badge-completed" class="mobile-tab-badge hidden">0</span>
+      </span>
+      <span>Done</span>
+    </button>
+  </nav>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+name: Build & Sign Mobile App (Google Play & Apple App Store)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+
+jobs:
+  build-android:
+    name: Build & Sign Android Release (.aab & .apk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java JDK 21 (Required for Android Gradle & Capacitor 6)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies & generate store icons
+        run: |
+          npm install
+          npm run icons:generate
+
+      - name: Add & Sync Capacitor Android Platform
+        run: |
+          if [ ! -d "android" ]; then npx cap add android; fi
+          npx cap sync android
+
+      - name: Build Android Release App Bundle (.aab) & APK (.apk)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease
+
+      - name: Sign Android App Bundle (.aab) & APK (.apk) for Google Play Store
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'PulseTodoStore2026!' }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'pulse-todo-key' }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD || 'PulseTodoStore2026!' }}
+        run: |
+          mkdir -p release-artifacts
+          KEYSTORE_FILE="release-artifacts/pulse-todo-upload-key.jks"
+
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "Using repository secret ANDROID_KEYSTORE_BASE64..."
+            echo "$KEYSTORE_B64" | base64 --decode > "$KEYSTORE_FILE"
+          else
+            echo "Generating production upload keystore via keytool..."
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE_FILE" \
+              -alias "$KEY_ALIAS" \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass "$KS_PASS" \
+              -keypass "$KEY_PASS" \
+              -dname "CN=Pulse ToDo, OU=Mobile, O=PulseToDo, L=London, ST=London, C=GB"
+          fi
+
+          # Sign the .aab bundle for Google Play Console
+          cp android/app/build/outputs/bundle/release/app-release.aab release-artifacts/pulse-todo-signed.aab
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore "$KEYSTORE_FILE" \
+            -storepass "$KS_PASS" \
+            -keypass "$KEY_PASS" \
+            release-artifacts/pulse-todo-signed.aab "$KEY_ALIAS"
+
+          # Sign and align the .apk for direct Android installation
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          "$BUILD_TOOLS_DIR/zipalign" -v -p 4 \
+            android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            release-artifacts/pulse-todo-aligned.apk
+
+          "$BUILD_TOOLS_DIR/apksigner" sign \
+            --ks "$KEYSTORE_FILE" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KS_PASS" \
+            --key-pass "pass:$KEY_PASS" \
+            --out release-artifacts/pulse-todo-signed.apk \
+            release-artifacts/pulse-todo-aligned.apk
+
+          rm -f release-artifacts/pulse-todo-aligned.apk
+
+          # Copy store listing graphic assets into the download bundle
+          cp public/icons/icon-512.png release-artifacts/google-play-icon-512x512.png
+          cp public/icons/feature-graphic-1024x500.png release-artifacts/google-play-feature-graphic-1024x500.png
+
+          cat <<EOF > release-artifacts/KEYSTORE_CREDENTIALS.txt
+          ==============================================================
+          PULSE TODO — GOOGLE PLAY UPLOAD KEYSTORE CREDENTIALS
+          ==============================================================
+          Upload File for Google Play Console : pulse-todo-signed.aab
+          Direct Install File for Android     : pulse-todo-signed.apk
+          Keystore File (KEEP SAFE FOR UPDATES): pulse-todo-upload-key.jks
+          Key Alias                           : $KEY_ALIAS
+          Keystore Password                   : $KS_PASS
+          Key Password                        : $KEY_PASS
+          ==============================================================
+          IMPORTANT: Save pulse-todo-upload-key.jks in a safe place!
+          When pushing future updates to Google Play, add this file as a
+          base64 secret named ANDROID_KEYSTORE_BASE64 in GitHub Settings.
+          EOF
+
+      - name: Upload Signed Google Play Bundle (.aab), Signed APK & Keystore
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-todo-google-play-signed-bundle
+          path: release-artifacts/*
+
+  build-ios:
+    name: Build iOS Project & Archive (macOS / Xcode)
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies & generate store icons
+        run: |
+          npm install
+          npm run icons:generate
+
+      - name: Add & Sync Capacitor iOS Platform + Inject 1024px App Store Icon
+        run: |
+          if [ ! -d "ios" ]; then npx cap add ios; fi
+          npx cap sync ios
+          cp public/icons/icon-1024.png ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+
+      - name: Verify iOS Release Compilation (Xcode)
+        working-directory: ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload Synced Xcode iOS Project & 1024px Icon for App Store Connect
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-todo-ios-xcode-project
+          path: |
+            ios/
+            public/icons/icon-1024.png
