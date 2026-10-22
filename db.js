@@ -249,10 +249,17 @@ function getAllCategories() {
   }));
 }
 
+const MAX_TITLE_LENGTH = 200;
+const MAX_DESCRIPTION_LENGTH = 5000;
+const MAX_CATEGORY_LENGTH = 50;
+
 function createCategory({ name, color }) {
   const cleanName = String(name || '').trim();
   if (!cleanName) {
     throw new Error('Category name is required');
+  }
+  if (cleanName.length > MAX_CATEGORY_LENGTH) {
+    throw new Error(`Category name cannot exceed ${MAX_CATEGORY_LENGTH} characters`);
   }
   const cleanColor = /^#[0-9a-fA-F]{6}$/.test(color || '') ? color : '#6366f1';
   const nowIso = new Date().toISOString();
@@ -295,10 +302,16 @@ function createTask(payload, todayStr = getLocalTodayStr()) {
   if (!title) {
     throw new Error('Task title is required');
   }
+  if (title.length > MAX_TITLE_LENGTH) {
+    throw new Error(`Task title cannot exceed ${MAX_TITLE_LENGTH} characters`);
+  }
   const description = String(payload.description || '').trim();
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error(`Task description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters`);
+  }
   const recurrence = VALID_RECURRENCES.has(payload.recurrence) ? payload.recurrence : 'none';
   const priority = VALID_PRIORITIES.has(payload.priority) ? payload.priority : 'medium';
-  const category = String(payload.category || 'Personal').trim() || 'Personal';
+  const category = (String(payload.category || 'Personal').trim() || 'Personal').slice(0, MAX_CATEGORY_LENGTH);
 
   let dueDate = payload.due_date ? String(payload.due_date).trim() : null;
   if (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
@@ -336,7 +349,13 @@ function updateTask(id, payload, todayStr = getLocalTodayStr()) {
   if (!title) {
     throw new Error('Task title cannot be empty');
   }
+  if (title.length > MAX_TITLE_LENGTH) {
+    throw new Error(`Task title cannot exceed ${MAX_TITLE_LENGTH} characters`);
+  }
   const description = payload.description !== undefined ? String(payload.description).trim() : existing.description;
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error(`Task description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters`);
+  }
   const recurrence = payload.recurrence !== undefined
     ? (VALID_RECURRENCES.has(payload.recurrence) ? payload.recurrence : 'none')
     : existing.recurrence;
@@ -344,7 +363,7 @@ function updateTask(id, payload, todayStr = getLocalTodayStr()) {
     ? (VALID_PRIORITIES.has(payload.priority) ? payload.priority : existing.priority)
     : existing.priority;
   const category = payload.category !== undefined
-    ? (String(payload.category).trim() || 'Personal')
+    ? (String(payload.category).trim() || 'Personal').slice(0, MAX_CATEGORY_LENGTH)
     : existing.category;
 
   let dueDate = payload.due_date !== undefined

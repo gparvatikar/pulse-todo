@@ -1390,15 +1390,21 @@ KEY FEATURES:
             body: { ref: defaultBranch }
           });
 
-          const repoUrl = `https://github.com/${owner}/${repoName}`;
-          const actionsUrl = `https://github.com/${owner}/${repoName}/actions`;
+          const escapeHtmlStr = (str) => String(str || '').replace(/[&<>"']/g, ch => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+          }[ch]));
+
+          const safeOwner = encodeURIComponent(owner);
+          const safeRepo = encodeURIComponent(repoName);
+          const repoUrl = `https://github.com/${safeOwner}/${safeRepo}`;
+          const actionsUrl = `https://github.com/${safeOwner}/${safeRepo}/actions`;
 
           ghStatusEl.style.background = 'rgba(16, 185, 129, 0.16)';
           ghStatusEl.style.border = '1px solid rgba(16, 185, 129, 0.4)';
           ghStatusEl.style.color = '#6ee7b7';
           ghStatusEl.innerHTML = `
-            ✅ <strong>Success! Uploaded ${files.length} files to <a href="${repoUrl}" target="_blank" style="color:#fff;text-decoration:underline;">${owner}/${repoName}</a>!</strong><br>
-            🎉 Your cloud Android &amp; iOS build is now running! 👉 <a href="${actionsUrl}" target="_blank" style="color:#fff;font-weight:700;text-decoration:underline;">Click here to open GitHub Actions &amp; download your signed .AAB bundle</a> (takes ~3 mins).
+            ✅ <strong>Success! Uploaded ${Number(files.length)} files to <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" style="color:#fff;text-decoration:underline;">${escapeHtmlStr(owner)}/${escapeHtmlStr(repoName)}</a>!</strong><br>
+            🎉 Your cloud Android &amp; iOS build is now running! 👉 <a href="${actionsUrl}" target="_blank" rel="noopener noreferrer" style="color:#fff;font-weight:700;text-decoration:underline;">Click here to open GitHub Actions &amp; download your signed .AAB bundle</a> (takes ~3 mins).
           `;
 
           const step1Cb = document.querySelector('input[data-step="gp-1"]');
@@ -1410,7 +1416,11 @@ KEY FEATURES:
           ghStatusEl.style.background = 'rgba(239, 68, 68, 0.16)';
           ghStatusEl.style.border = '1px solid rgba(239, 68, 68, 0.4)';
           ghStatusEl.style.color = '#fca5a5';
-          ghStatusEl.innerHTML = `❌ <strong>Error:</strong> ${err.message}`;
+          ghStatusEl.textContent = '';
+          const strongEl = document.createElement('strong');
+          strongEl.textContent = '❌ Error: ';
+          ghStatusEl.appendChild(strongEl);
+          ghStatusEl.appendChild(document.createTextNode(err && err.message ? err.message : 'Unexpected error'));
         } finally {
           autoPushBtn.disabled = false;
           autoPushBtn.innerHTML = origLabel;

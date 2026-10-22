@@ -382,6 +382,9 @@
       if (pathname === '/api/tasks' && method === 'POST') {
         const title = String(body.title || '').trim();
         if (!title) throw new Error('Task title is required');
+        if (title.length > 200) throw new Error('Task title cannot exceed 200 characters');
+        const description = String(body.description || '').trim();
+        if (description.length > 5000) throw new Error('Task description cannot exceed 5000 characters');
         const recurrence = body.recurrence || 'none';
         const dueDate = body.due_date || (recurrence !== 'none' ? (body.client_today || getLocalTodayStr()) : null);
         const nextId = tasks.reduce((max, t) => Math.max(max, Number(t.id) || 0), 0) + 1;
@@ -389,11 +392,11 @@
         const newTask = {
           id: nextId,
           title,
-          description: String(body.description || '').trim(),
+          description,
           due_date: dueDate,
           recurrence,
           priority: body.priority || 'medium',
-          category: body.category || 'Personal',
+          category: String(body.category || 'Personal').trim().slice(0, 50) || 'Personal',
           completed: false,
           completed_at: null,
           spawned_next_id: null,
@@ -474,14 +477,19 @@
         if (idx === -1) throw new Error('Task not found');
         if (method === 'PUT') {
           const existing = tasks[idx];
+          const nextTitle = body.title !== undefined ? String(body.title).trim() : existing.title;
+          if (!nextTitle) throw new Error('Task title cannot be empty');
+          if (nextTitle.length > 200) throw new Error('Task title cannot exceed 200 characters');
+          const nextDesc = body.description !== undefined ? String(body.description).trim() : existing.description;
+          if (nextDesc.length > 5000) throw new Error('Task description cannot exceed 5000 characters');
           const updated = {
             ...existing,
-            title: body.title !== undefined ? String(body.title).trim() : existing.title,
-            description: body.description !== undefined ? String(body.description).trim() : existing.description,
+            title: nextTitle,
+            description: nextDesc,
             due_date: body.due_date !== undefined ? (body.due_date || null) : existing.due_date,
             recurrence: body.recurrence !== undefined ? body.recurrence : existing.recurrence,
             priority: body.priority !== undefined ? body.priority : existing.priority,
-            category: body.category !== undefined ? body.category : existing.category,
+            category: body.category !== undefined ? String(body.category).trim().slice(0, 50) : existing.category,
             updated_at: new Date().toISOString()
           };
           tasks[idx] = updated;
@@ -498,11 +506,13 @@
       if (pathname === '/api/categories' && method === 'POST') {
         const cleanName = String(body.name || '').trim();
         if (!cleanName) throw new Error('Category name is required');
+        if (cleanName.length > 50) throw new Error('Category name cannot exceed 50 characters');
         if (categories.some(c => c.name.toLowerCase() === cleanName.toLowerCase())) {
           throw new Error('Category already exists');
         }
+        const cleanColor = /^#[0-9a-fA-F]{6}$/.test(body.color || '') ? body.color : '#6366f1';
         const nextId = categories.reduce((max, c) => Math.max(max, Number(c.id) || 0), 0) + 1;
-        const category = { id: nextId, name: cleanName, color: body.color || '#6366f1' };
+        const category = { id: nextId, name: cleanName, color: cleanColor };
         categories.push(category);
         saveSnapshot(tasks, categories);
         return { category };
@@ -597,9 +607,13 @@
   }
 
   // Category Helpers
+  function sanitizeHexColor(color) {
+    return /^#[0-9a-fA-F]{6}$/.test(String(color || '')) ? color : '#6366f1';
+  }
+
   function getCategoryColor(catName) {
     const found = state.categories.find(c => c.name.toLowerCase() === String(catName || '').toLowerCase());
-    return found ? found.color : '#6366f1';
+    return found ? sanitizeHexColor(found.color) : '#6366f1';
   }
 
   function renderCategories() {

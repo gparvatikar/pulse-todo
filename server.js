@@ -17,7 +17,8 @@ const {
 } = require('./db');
 
 const PORT = process.env.PORT || 3000;
-const PUBLIC_DIR = path.join(__dirname, 'public');
+const HOST = process.env.HOST || '127.0.0.1';
+const PUBLIC_DIR = path.resolve(__dirname, 'public');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -29,9 +30,33 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.github.com; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+};
+
+function isTrustedOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true; // Same-origin GET or non-CORS request without Origin header
+  try {
+    const originHost = new URL(origin).host;
+    const reqHost = req.headers.host || `localhost:${PORT}`;
+    return (
+      originHost === reqHost ||
+      originHost === `localhost:${PORT}` ||
+      originHost === `127.0.0.1:${PORT}`
+    );
+  } catch {
+    return false;
+  }
+}
+
 function sendJson(res, statusCode, data) {
   const body = JSON.stringify(data);
   res.writeHead(statusCode, {
+    ...SECURITY_HEADERS,
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store'
   });
@@ -66,6 +91,10 @@ function parseJsonBody(req) {
 async function handleApiRequest(req, res, urlObj) {
   const pathname = urlObj.pathname;
   const method = req.method.toUpperCase();
+
+  if (!isTrustedOrigin(req)) {
+    return sendJson(res, 403, { error: 'Forbidden cross-origin request' });
+  }
 
   try {
     // GET /api/bootstrap - Fetch tasks, categories, and server today string in one request
@@ -401,12 +430,21 @@ async function handleApiRequest(req, res, urlObj) {
 }
 
 function serveStaticFile(req, res, urlObj) {
-  let reqPath = urlObj.pathname === '/' ? '/index.html' : urlObj.pathname;
-  const safePath = path.normalize(reqPath).replace(/^(\.\.[/\\])+/, '');
-  const filePath = path.join(PUBLIC_DIR, safePath);
+  let decodedPathname;
+  try {
+    decodedPathname = decodeURIComponent(urlObj.pathname);
+  } catch {
+    res.writeHead(400, SECURITY_HEADERS);
+    res.end('Bad Request');
+    return;
+  }
 
-  if (!filePath.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403);
+  const reqPath = decodedPathname === '/' ? 'index.html' : decodedPathname.replace(/^[/\\]+/, '');
+  const filePath = path.resolve(PUBLIC_DIR, reqPath);
+  const relPath = path.relative(PUBLIC_DIR, filePath);
+
+  if (relPath.startsWith('..') || path.isAbsolute(relPath)) {
+    res.writeHead(403, SECURITY_HEADERS);
     res.end('Forbidden');
     return;
   }
@@ -417,15 +455,18 @@ function serveStaticFile(req, res, urlObj) {
         // Fallback to index.html for SPA navigation
         fs.readFile(path.join(PUBLIC_DIR, 'index.html'), (err2, indexContent) => {
           if (err2) {
-            res.writeHead(404);
+            res.writeHead(404, SECURITY_HEADERS);
             res.end('Not found');
             return;
           }
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.writeHead(200, {
+            ...SECURITY_HEADERS,
+            'Content-Type': 'text/html; charset=utf-8'
+          });
           res.end(indexContent);
         });
       } else {
-        res.writeHead(500);
+        res.writeHead(500, SECURITY_HEADERS);
         res.end('Internal server error');
       }
       return;
@@ -433,7 +474,10 @@ function serveStaticFile(req, res, urlObj) {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': contentType });
+    res.writeHead(200, {
+      ...SECURITY_HEADERS,
+      'Content-Type': contentType
+    });
     res.end(content);
   });
 }
@@ -448,8 +492,8 @@ const server = http.createServer((req, res) => {
 });
 
 if (require.main === module) {
-  server.listen(PORT, () => {
-    console.log(`Pulse ToDo Server running at http://localhost:${PORT}`);
+  server.listen(PORT, HOST, () => {
+    console.log(`Pulse ToDo Server running at http://${HOST}:${PORT}`);
   });
 }
 

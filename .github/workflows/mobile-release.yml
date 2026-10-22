@@ -47,12 +47,25 @@ jobs:
       - name: Sign Android App Bundle (.aab) & APK (.apk) for Google Play Store
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'PulseTodoStore2026!' }}
+          SECRET_KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'pulse-todo-key' }}
-          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD || 'PulseTodoStore2026!' }}
+          SECRET_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           mkdir -p release-artifacts
           KEYSTORE_FILE="release-artifacts/pulse-todo-upload-key.jks"
+
+          if [ -n "$SECRET_KS_PASS" ]; then
+            KS_PASS="$SECRET_KS_PASS"
+          else
+            KS_PASS=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 24)
+            echo "::add-mask::$KS_PASS"
+          fi
+
+          if [ -n "$SECRET_KEY_PASS" ]; then
+            KEY_PASS="$SECRET_KEY_PASS"
+          else
+            KEY_PASS="$KS_PASS"
+          fi
 
           if [ -n "$KEYSTORE_B64" ]; then
             echo "Using repository secret ANDROID_KEYSTORE_BASE64..."
